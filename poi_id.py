@@ -28,14 +28,12 @@ from sklearn.naive_bayes import GaussianNB
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.ensemble import AdaBoostClassifier
 
-### Task 1: Select what features you'll use.
-### features_list is a list of strings, each of which is a feature name.
-### The first feature must be "poi".
-
+#features_list contains the features that will be used in the pipeline.
 features_list = ['poi','salary', 'bonus', 'total_stock_value','exercised_stock_options',
-                 'bonus_salary_ratio','total_payments_and_stock'] # You will need to use more features
+                 'bonus_salary_ratio','total_payments_and_stock']
 
 '''
+#All my features:
 'salary', 'deferral_payments', 'total_payments', 'loan_advances', 'bonus',
                  'restricted_stock_deferred', 'deferred_income', 'total_stock_value', 'expenses',
                  'exercised_stock_options', 'other', 'long_term_incentive', 'restricted_stock',
@@ -52,10 +50,7 @@ features_list = ['poi','salary', 'bonus', 'total_stock_value','exercised_stock_o
 with open("final_project_dataset.pkl", "r") as data_file:
     data_dict = pickle.load(data_file)
 
-### Task 2: Remove outliers
-
 #Find the total number of data points.
-
 data_points = 0.
 for name in data_dict:
     for feature in data_dict[name]:
@@ -63,7 +58,6 @@ for name in data_dict:
 print "total data points: ", data_points
 
 #Find the number of POI and non-POI data points.
-
 POI_data_points = 0.
 for name in data_dict:
     if data_dict[name]['poi'] == 1:
@@ -81,7 +75,6 @@ percent_non_POI_data_points = 1 - percent_POI_data_points
 print "non-POI% dp: ", percent_non_POI_data_points
 
 #Find total number of employees and POIs.
-
 total_names = 0.
 for name in data_dict:
     total_names += 1
@@ -94,7 +87,6 @@ for name in data_dict:
 print "number of POIs: ", poi
 
 #Find how many missing data points are in each feature for POIs and non-POIs.
-
 POI_nan = {}
 non_POI_nan = {}
 
@@ -111,8 +103,8 @@ for name in data_dict:
                     non_POI_nan[feature] = 0
                 non_POI_nan[feature] += 1
 
-print POI_nan
-print non_POI_nan
+print "Number of POI NaNs: ", POI_nan
+print "Number of non-POI NaNs: ", non_POI_nan
 
 #Search through data_dict to find any unexpected names.
 '''
@@ -120,12 +112,10 @@ for name in data_dict:
     print name
 '''
 #'TOTAL', and 'THE TRAVEL AGENCY IN THE PARK' are not employees who worked at Enron, so they will be removed.
-
 data_dict.pop("TOTAL")
 data_dict.pop("THE TRAVEL AGENCY IN THE PARK")
 
 #If an employee at Enron [name] has a feature with a value of 'NaN', add 1 to their name in nan_count.
-
 nan_count = {}
 for name in data_dict:
     for feature in data_dict[name]:
@@ -148,8 +138,7 @@ for name, value in nan_count.iteritems():
 
 data_dict.pop("LOCKHART EUGENE E")
 
-#Validate the values of total_payments and total_stock_value in the data.
-
+#Validate the values of total_payments in the data. 
 for name in data_dict:
     for feature in data_dict[name]:
         if data_dict[name][feature] == 'NaN':
@@ -167,6 +156,7 @@ data_dict['BHATNAGAR SANJAY']['total_payments'] = (data_dict['BHATNAGAR SANJAY']
                                                    data_dict['BHATNAGAR SANJAY']['deferred_income'] + data_dict['BHATNAGAR SANJAY']['deferral_payments'] + data_dict['BHATNAGAR SANJAY']['loan_advances'] +
                                                    data_dict['BHATNAGAR SANJAY']['other'] + data_dict['BHATNAGAR SANJAY']['expenses'] + data_dict['BHATNAGAR SANJAY']['director_fees'])
 
+#Validate the values of total_stock_value in the data.
 for name in data_dict:
     for feature in data_dict[name]:
         if data_dict[name][feature] == 'NaN':
@@ -181,7 +171,6 @@ data_dict['BELFER ROBERT']['total_stock_value'] != (data_dict['BELFER ROBERT']['
 data_dict['BHATNAGAR SANJAY']['total_stock_value'] != (data_dict['BHATNAGAR SANJAY']['exercised_stock_options'] + data_dict['BHATNAGAR SANJAY']['restricted_stock'] +
                                              data_dict['BHATNAGAR SANJAY']['restricted_stock_deferred'])
     
-### Task 3: Create new feature(s)
 
 #A new feature is created by dividing the first feature, by the second feature. NaN values are set to 0 for the
 #first feature, and if the second feature has a value of NaN, then the new feature's value is set to 0, because
@@ -227,8 +216,7 @@ def new_feature_4_inputs_divide(new,first,second,third,fourth):
                                     float(int(data_dict[name][third]) +
                                           int(data_dict[name][fourth])))            
             
-    
-
+#Create the new features
 new_feature_2_inputs_divide('bonus_salary_ratio', 'bonus', 'salary')
 new_feature_2_inputs_add('total_payments_and_stock', 'total_payments', 'total_stock_value')
 new_feature_2_inputs_add('to_and_from_poi_emails', 'from_poi_to_this_person','from_this_person_to_poi')
@@ -247,15 +235,14 @@ labels, features = targetFeatureSplit(data)
 
 #Draw a plot comparing two features: f1_name and f2_name, along with their prediction line: pred.
 def Draw(pred, features, poi, mark_poi=False, name="image.png", f1_name="feature 1", f2_name="feature 2"):
-    """ some plotting code designed to help you visualize your clusters """
 
-    ### plot each cluster with a different color--add more colors for
-    ### drawing more than five clusters
+    #plot each cluster with a different color--add more colors for
+    #drawing more than five clusters
     colors = ["b", "c", "k", "m", "g"]
     for ii, pp in enumerate(pred):
         plt.scatter(features[ii][0], features[ii][1], color = colors[pred[ii]])
 
-    ### if you like, place red stars over points that are POIs (just for funsies)
+    #place red stars over points that are POIs (to see them better)
     if mark_poi:
         for ii, pp in enumerate(pred):
             if poi[ii]:
@@ -275,25 +262,7 @@ pred = KMeans(n_clusters=2).fit_predict(plot_features)
 
 #Draw(pred, plot_features, poi, mark_poi=True, name="clusters1.pdf", f1_name=feature_1, f2_name=feature_2)
 
-
-### Task 4: Try a varity of classifiers
-### Please name your classifier clf for easy export below.
-### Note that if you want to do PCA or other multi-stage operations,
-### you'll need to use Pipelines. For more info:
-### http://scikit-learn.org/stable/modules/pipeline.html
-
-
-'''Task 4 and 5 are completed together below.'''
-
-
-### Task 5: Tune your classifier to achieve better than .3 precision and recall 
-### using our testing script. Check the tester.py script in the final project
-### folder for details on the evaluation method, especially the test_classifier
-### function. Because of the small size of the dataset, the script uses
-### stratified shuffle split cross validation. For more info: 
-### http://scikit-learn.org/stable/modules/generated/sklearn.cross_validation.StratifiedShuffleSplit.html
-
-# Example starting point. Try investigating other evaluation techniques!
+#Prepare data fro cross_validation
 from sklearn.cross_validation import train_test_split
 features_train, features_test, labels_train, labels_test = train_test_split(features, labels, test_size=0.1, random_state=42)
 
@@ -334,6 +303,7 @@ parameters = dict(#select_KBest__k= [3],
                   #ada__algorithm = ['SAMME.R']
           )
 
+#Execute pipeline via GridSearchCV
 grid_search = GridSearchCV(pipe, parameters, n_jobs = 1, cv = sss, scoring='f1', verbose = 2)
 
 grid_search.fit(features, labels)
@@ -364,10 +334,7 @@ print 'Feature Scores', features_scores_selected
 #set clf equal to the best POI identifier.
 clf = grid_search.best_estimator_
 
-### Task 6: Dump your classifier, dataset, and features_list so anyone can
-### check your results. You do not need to change anything below, but make sure
-### that the version of poi_id.py that you submit can be run on its own and
-### generates the necessary .pkl files for validating your results.
+#Dump classifier, dataset, and features_list so anyone can check results. 
 
 dump_classifier_and_data(clf, my_dataset, features_list)
 
